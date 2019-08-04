@@ -24,13 +24,18 @@ static ssize_t chrdev_read(struct file *file, char __user *ubuf, size_t count, l
     char message[] = "This is chrdev test\n";
     ssize_t bytes = sizeof(message);
 
+    if (*ppos) {
+        return 0;
+    }
+
     printk(KERN_ALERT "chrdev_read\n");
 
-    ret = copy_to_user(ubuf, &message, bytes);
+    ret = copy_to_user(ubuf, message, bytes);
     if (ret) {
         printk(KERN_WARNING "copy_to_user failed\n");
         return -EINVAL;
     }
+    *ppos += bytes;
 
     printk(KERN_ALERT "read success\n");
 
